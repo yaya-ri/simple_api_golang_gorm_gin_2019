@@ -1,7 +1,11 @@
 package controllers
 
 import (
+	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
 	"privy/common"
 	"privy/model"
 	"strconv"
@@ -320,4 +324,50 @@ func (idb *InDB) UpdateCategoryProduct(c *gin.Context) {
 	res.Data = err.Value
 	c.JSON(http.StatusOK, res)
 
+}
+
+func (idb *InDB) UploadImage(c *gin.Context) {
+	var res model.Response
+	var image model.Image
+
+	now := time.Now()
+
+	file, header, err := c.Request.FormFile("file")
+	filename := header.Filename
+	url := "./images/" + filename + ".png"
+	fmt.Println(file)
+	out, err := os.Create(url)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	defer out.Close()
+	_, err = io.Copy(out, file)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	enable := false
+
+	image.Name = filename
+	image.File = url
+	image.Enable = &enable
+	image.CreatedAt = now
+	image.UpdatedAt = now
+
+	save := idb.DB.Create(&image)
+
+	if save.Error != nil {
+		res.Success = false
+		res.Message = "can't save data to database"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	res.Success = true
+	res.Message = "Success save data to database"
+	res.Data = save.Value
+	c.JSON(http.StatusOK, res)
 }
