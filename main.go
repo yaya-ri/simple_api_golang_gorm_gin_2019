@@ -25,5 +25,8 @@ func main() {
 	router.POST("/category_product", inDB.InsertCategoryProduct)
 	router.PUT("/category_product/:id", inDB.UpdateCategoryProduct)
 
+	router.POST("/image", inDB.UploadImage)
+	//router.PUT("/category_product/:id", inDB.UpdateCategoryProduct)
+
 	router.Run(":3000")
 }
