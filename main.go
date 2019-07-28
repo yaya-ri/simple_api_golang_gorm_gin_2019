@@ -16,10 +16,14 @@ func main() {
 
 	router.GET("/category", inDB.GetCategoryList)
 	router.POST("/category", inDB.InsertCategory)
+	router.PUT("/category/:id", inDB.UpdateCategory)
+
 	router.POST("/product", inDB.InsertProduct)
 	router.GET("/product", inDB.GetProductList)
+	router.PUT("/product/:id", inDB.UpdateProduct)
 
-	router.GET("/category_product", inDB.InsertCategoryProduct)
+	router.POST("/category_product", inDB.InsertCategoryProduct)
+	router.PUT("/category_product/:id", inDB.UpdateCategoryProduct)
 
 	router.Run(":3000")
 }
