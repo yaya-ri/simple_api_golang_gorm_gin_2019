@@ -19,5 +19,7 @@ func main() {
 	router.POST("/product", inDB.InsertProduct)
 	router.GET("/product", inDB.GetProductList)
 
+	router.GET("/category_product", inDB.InsertCategoryProduct)
+
 	router.Run(":3000")
 }
