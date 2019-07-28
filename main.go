@@ -14,8 +14,10 @@ func main() {
 
 	router := gin.Default()
 
+	router.GET("/category", inDB.GetCategoryList)
 	router.POST("/category", inDB.InsertCategory)
 	router.POST("/product", inDB.InsertProduct)
+	router.GET("/product", inDB.GetProductList)
 
 	router.Run(":3000")
 }
