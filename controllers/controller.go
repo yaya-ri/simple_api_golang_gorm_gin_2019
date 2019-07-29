@@ -22,6 +22,13 @@ func (idb *InDB) InsertCategory(c *gin.Context) {
 	category_name := c.PostForm("name")
 	category_enable := true
 
+	if category_name == "" {
+		res.Success = false
+		res.Message = "request not valid"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
 	category.Name = category_name
 	category.Enable = &category_enable
 	category.CreatedAt = now
@@ -44,7 +51,7 @@ func (idb *InDB) InsertCategory(c *gin.Context) {
 }
 
 func (idb *InDB) InsertProduct(c *gin.Context) {
-	var product model.Product
+	var product model.ProductModel
 	var res model.Response
 	now := time.Now()
 
@@ -52,13 +59,20 @@ func (idb *InDB) InsertProduct(c *gin.Context) {
 	product_description := c.PostForm("description")
 	product_enable := true
 
+	if product_name == "" || product_description == "" {
+		res.Success = false
+		res.Message = "request not valid"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
 	product.Name = product_name
 	product.Enable = &product_enable
 	product.Description = product_description
 	product.CreatedAt = now
 	product.UpdatedAt = now
 
-	err := idb.DB.Create(&product)
+	err := idb.DB.Table("products").Create(&product)
 
 	if err.Error != nil {
 		common.Error(err.Error, "Failed to insert product")
@@ -201,6 +215,13 @@ func (idb *InDB) UpdateProduct(c *gin.Context) {
 	name := c.PostForm("name")
 	description := c.PostForm("description")
 	enable := c.PostForm("enable")
+
+	// if name == "" || description == "" || enable == "" {
+	// 	res.Success = false
+	// 	res.Message = "request not valid"
+	// 	c.JSON(http.StatusBadRequest, res)
+	// 	return
+	// }
 	e := true
 	if enable == "true" {
 		e = true
@@ -256,6 +277,13 @@ func (idb *InDB) UpdateCategory(c *gin.Context) {
 		e = true
 	} else if enable == "false" {
 		e = false
+	}
+
+	if enable == "" {
+		res.Success = false
+		res.Message = "request not valid"
+		c.JSON(http.StatusBadRequest, res)
+		return
 	}
 
 	var category model.Category
@@ -441,7 +469,7 @@ func (idb *InDB) GetAll(c *gin.Context) {
 	}
 
 	res.Success = true
-	res.Message = "uccess get product with category from database"
+	res.Message = "Success get product with category and image from database"
 	res.Data = all
 	c.JSON(http.StatusOK, res)
 }
