@@ -112,7 +112,7 @@ func (idb *InDB) GetCategoryList(c *gin.Context) {
 }
 
 func (idb *InDB) GetProductList(c *gin.Context) {
-	var products []*model.Product
+	var products []*model.ProductModel
 	var res model.Response
 
 	enableParam := c.Query("enable")
@@ -124,7 +124,9 @@ func (idb *InDB) GetProductList(c *gin.Context) {
 		enable = false
 	}
 
-	err := idb.DB.Where("enable = ?", enable).Find(&products)
+	//idb.DB.SingularTable(true)
+
+	err := idb.DB.Table("products").Where("enable = ?", enable).Find(&products)
 
 	if err.Error != nil {
 		common.Error(err.Error, "Failed get product list")
@@ -218,8 +220,12 @@ func (idb *InDB) UpdateProduct(c *gin.Context) {
 		return
 	}
 	//newProduct.ID = product.ID
-	newProduct.Name = name
-	newProduct.Description = description
+	if name != "" {
+		newProduct.Name = name
+	}
+	if description != "" {
+		newProduct.Description = description
+	}
 	newProduct.Enable = &e
 	newProduct.UpdatedAt = time.Now()
 
@@ -264,6 +270,9 @@ func (idb *InDB) UpdateCategory(c *gin.Context) {
 		return
 	}
 	//newProduct.ID = product.ID
+	if name != "" {
+		newCategory.Name = name
+	}
 	newCategory.Name = name
 	newCategory.Enable = &e
 	newCategory.UpdatedAt = time.Now()
@@ -290,6 +299,13 @@ func (idb *InDB) UpdateCategoryProduct(c *gin.Context) {
 	id := c.Param("id")
 	product_id := c.PostForm("product_id")
 	category_id := c.PostForm("category_id")
+
+	if product_id == "" || category_id == "" {
+		res.Success = false
+		res.Message = "request not valid"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
 
 	p_id, _ := strconv.ParseUint(product_id, 10, 32)
 	c_id, _ := strconv.ParseUint(category_id, 10, 32)
@@ -369,5 +385,63 @@ func (idb *InDB) UploadImage(c *gin.Context) {
 	res.Success = true
 	res.Message = "Success save data to database"
 	res.Data = save.Value
+	c.JSON(http.StatusOK, res)
+}
+
+func (idb *InDB) InsertProductImage(c *gin.Context) {
+	var productImage model.ProductImage
+	var res model.Response
+	now := time.Now()
+
+	product_id := c.PostForm("product_id")
+	image_id := c.PostForm("image_id")
+	p_id, _ := strconv.ParseUint(product_id, 10, 32)
+	i_id, _ := strconv.ParseUint(image_id, 10, 32)
+
+	productImage.ProductID = uint(p_id)
+	productImage.ImageID = uint(i_id)
+	productImage.CreatedAt = now
+	productImage.UpdatedAt = now
+
+	if productImage.ImageID == 0 || productImage.ProductID == 0 {
+		res.Success = false
+		res.Message = "request not valid"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	err := idb.DB.Create(&productImage)
+
+	if err.Error != nil {
+		common.Error(err.Error, "Failed to insert product image")
+		res.Success = false
+		res.Message = "can't save to database"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	res.Success = true
+	res.Message = "Success save data to database"
+	res.Data = err.Value
+	c.JSON(http.StatusOK, res)
+}
+
+func (idb *InDB) GetAll(c *gin.Context) {
+	var res model.Response
+	var all []model.Product
+
+	err := idb.DB.Preload("Category", "enable=?", true).Preload("Image", "enable=?", true).Find(&all)
+
+	if err.Error != nil {
+		common.Error(err.Error, "Failed to get product category: ")
+		res.Success = false
+		res.Message = "can't get data from database"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	res.Success = true
+	res.Message = "uccess get product with category from database"
+	res.Data = all
 	c.JSON(http.StatusOK, res)
 }
