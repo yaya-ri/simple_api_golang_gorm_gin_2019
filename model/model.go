@@ -35,12 +35,11 @@ type Image struct {
 }
 
 type CategoryProduct struct {
-	ID         uint       `gorm:"primary_key;column:id" json:"id"`
-	ProductID  uint       `gorm:"column:product_id" json:"product_id"`
-	CategoryID uint       `gorm:"column:category_id" json:"category_id"`
-	CreatedAt  time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt  time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeletedAt  *time.Time `gorm:"deleted_at" json:"-"`
+	ID         uint      `gorm:"primary_key;column:id" json:"id"`
+	ProductID  uint      `gorm:"column:product_id" json:"product_id"`
+	CategoryID uint      `gorm:"column:category_id" json:"category_id"`
+	CreatedAt  time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt  time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
 type CP struct {
@@ -53,12 +52,11 @@ type CP struct {
 }
 
 type ProductImage struct {
-	ID        uint       `gorm:"primary_key;column:id" json:"id"`
-	ProductID uint       `gorm:"column:product_id" json:"product_id"`
-	ImageID   uint       `gorm:"column:image_id" json:"image_id"`
-	CreatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeletedAt *time.Time `gorm:"deleted_at" json:"-"`
+	ID        uint      `gorm:"primary_key;column:id" json:"id"`
+	ProductID uint      `gorm:"column:product_id" json:"product_id"`
+	ImageID   uint      `gorm:"column:image_id" json:"image_id"`
+	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
 type Product struct {

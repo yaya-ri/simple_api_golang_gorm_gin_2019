@@ -29,7 +29,9 @@ func main() {
 	router.DELETE("category_product/:id", inDB.DeleteCategoryProduct)
 
 	router.POST("/image", inDB.UploadImage)
+	router.GET("image", inDB.GetImageList)
 	router.DELETE("image/:id", inDB.DeleteImage)
+	router.PUT("image/:id", inDB.EnableImage)
 
 	//router.PUT("/category_product/:id", inDB.UpdateCategoryProduct)
 

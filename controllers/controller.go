@@ -171,15 +171,7 @@ func (idb *InDB) DeleteCategory(c *gin.Context) {
 		c.JSON(http.StatusBadGateway, res)
 		return
 	}
-
-	err = idb.DB.Exec("UPDATE category_products SET deleted_at=? WHERE category_id=?", time.Now(), id)
-
-	if err.Error != nil {
-		res.Success = false
-		res.Message = "can't delete data from category_products"
-		c.JSON(http.StatusBadGateway, res)
-		return
-	}
+	err = idb.DB.Exec("DELETE FROM category_products WHERE category_id=?", id)
 
 	res.Success = true
 	res.Message = "Success delete data from database"
@@ -352,9 +344,9 @@ func (idb *InDB) DeleteProduct(c *gin.Context) {
 		return
 	}
 
-	err = idb.DB.Exec("UPDATE category_products SET deleted_at=? WHERE product_id=?", time.Now(), id)
+	err = idb.DB.Exec("DELETE FROM category_products WHERE product_id=?", id)
 
-	err = idb.DB.Exec("UPDATE product_images SET deleted_at=? WHERE product_id=?", time.Now(), id)
+	err = idb.DB.Exec("DELETE FROM product_images WHERE product_id=?", id)
 
 	res.Success = true
 	res.Message = "Success delete data from database"
@@ -459,13 +451,9 @@ func (idb *InDB) UpdateCategoryProduct(c *gin.Context) {
 func (idb *InDB) DeleteCategoryProduct(c *gin.Context) {
 	var res model.Response
 
-	now := time.Now()
-
 	id := c.Param("id")
 
 	var categoryProduct model.CategoryProduct
-	var newCategoryProduct model.CategoryProduct
-
 	err := idb.DB.First(&categoryProduct, id)
 
 	if err.Error != nil {
@@ -475,9 +463,7 @@ func (idb *InDB) DeleteCategoryProduct(c *gin.Context) {
 		return
 	}
 
-	newCategoryProduct.DeletedAt = &now
-
-	err = idb.DB.Model(&categoryProduct).Update(newCategoryProduct)
+	err = idb.DB.Delete(&categoryProduct)
 
 	if err.Error != nil {
 		res.Success = false
@@ -516,7 +502,7 @@ func (idb *InDB) UploadImage(c *gin.Context) {
 		return
 	}
 
-	enable := false
+	enable := true
 
 	image.Name = filename
 	image.File = url
@@ -537,6 +523,93 @@ func (idb *InDB) UploadImage(c *gin.Context) {
 	res.Message = "Success save data to database"
 	res.Data = save.Value
 	c.JSON(http.StatusOK, res)
+}
+
+func (idb *InDB) GetImageList(c *gin.Context) {
+	var images []*model.Image
+	var res model.Response
+
+	enableParam := c.Query("enable")
+
+	enable := true
+	if enableParam == "true" {
+		enable = true
+	} else if enableParam == "false" {
+		enable = false
+	}
+
+	err := idb.DB.Where("enable = ? AND deleted_at IS NULL", enable).Find(&images)
+
+	if err.Error != nil {
+		common.Error(err.Error, "Failed get image list")
+		res.Success = false
+		res.Message = "Failed get image list"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	if len(images) == 0 {
+		res.Success = true
+		res.Message = "image is empty"
+		c.JSON(http.StatusOK, res)
+		return
+	} else {
+		res.Success = true
+		res.Message = "Success get image list"
+		res.Data = images
+		c.JSON(http.StatusOK, res)
+	}
+}
+
+func (idb *InDB) EnableImage(c *gin.Context) {
+	var res model.Response
+
+	id := c.Param("id")
+	enable := c.PostForm("enable")
+	e := true
+	if enable == "true" {
+		e = true
+	} else if enable == "false" {
+		e = false
+	}
+
+	if enable == "" {
+		res.Success = false
+		res.Message = "request not valid"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	var image model.Image
+	var newImage model.Image
+
+	err := idb.DB.First(&image, id)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "can't get data from database"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+	//newProduct.ID = product.ID
+
+	newImage.Enable = &e
+	newImage.UpdatedAt = time.Now()
+
+	err = idb.DB.Model(&image).Update(newImage)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "can't update data to database"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	res.Success = true
+	res.Message = "Success update data to database"
+	res.Data = err.Value
+	c.JSON(http.StatusOK, res)
+
 }
 
 func (idb *InDB) InsertProductImage(c *gin.Context) {
@@ -581,10 +654,8 @@ func (idb *InDB) DeleteProductImage(c *gin.Context) {
 	var res model.Response
 
 	id := c.Param("id")
-	now := time.Now()
 
 	var productImage model.ProductImage
-	var newProductImage model.ProductImage
 
 	err := idb.DB.First(&productImage, id)
 
@@ -595,9 +666,7 @@ func (idb *InDB) DeleteProductImage(c *gin.Context) {
 		return
 	}
 
-	newProductImage.DeletedAt = &now
-
-	err = idb.DB.Model(&productImage).Update(newProductImage)
+	err = idb.DB.Delete(&productImage)
 
 	if err.Error != nil {
 		res.Success = false
@@ -642,7 +711,7 @@ func (idb *InDB) DeleteImage(c *gin.Context) {
 		return
 	}
 
-	err = idb.DB.Exec("UPDATE product_images SET deleted_at=? WHERE image_id=?", time.Now(), id)
+	err = idb.DB.Exec("DELETE FROM product_images WHERE image_id=?", id)
 
 	res.Success = true
 	res.Message = "Success delete data from database"
