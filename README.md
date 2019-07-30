@@ -21,15 +21,20 @@ Untuk menjalankan API ini pada local repository berikut instalasinya
 
      GET  localhost:3000/category                 
      POST localhost:3000/category                 
-     PUT  localhost:3000/category/:id             
+     PUT  localhost:3000/category/:id    
+     DEL  localhost:3000/category/:id             
      POST localhost:3000/product                  
      GET  localhost:3000/product                  
-     PUT  localhost:3000/product/:id             
+     PUT  localhost:3000/product/:id
+     DEL  localhost:3000/product/:id 
      POST localhost:3000/category_product         
-     PUT  localhost:3000/category_product/:id     
-     POST localhost:3000/image                    
-     POST localhost:3000/product_image            
-     GET  localhost:3000/getAll                   //Gi gunakan untuk menampilkan combinasi data semua table
+     PUT  localhost:3000/category_product/:id 
+     DEL  localhost:3000/category_product/:id 
+     POST localhost:3000/image
+     DEL  localhost:3000/image/:id 
+     POST localhost:3000/product_image
+     DEL  localhost:3000/product_image/:id 
+     GET  localhost:3000/getAll                   //Di gunakan untuk menampilkan combinasi data semua table
      
 *Note: untuk lebih jelasnya saya menyertakan postman collection pada project ini yg bisa langsung digunakan 
 
