@@ -147,6 +147,8 @@ func (idb *InDB) DeleteCategory(c *gin.Context) {
 
 	id := c.Param("id")
 
+	now := time.Now()
+
 	var category model.Category
 	var newCategory model.Category
 
@@ -159,7 +161,7 @@ func (idb *InDB) DeleteCategory(c *gin.Context) {
 		return
 	}
 
-	newCategory.DeletedAt = time.Now()
+	newCategory.DeletedAt = &now
 
 	err = idb.DB.Model(&category).Update(newCategory)
 
@@ -325,6 +327,7 @@ func (idb *InDB) DeleteProduct(c *gin.Context) {
 	var res model.Response
 
 	id := c.Param("id")
+	now := time.Now()
 
 	var product model.Product
 	var newProduct model.Product
@@ -338,7 +341,7 @@ func (idb *InDB) DeleteProduct(c *gin.Context) {
 		return
 	}
 
-	newProduct.DeletedAt = time.Now()
+	newProduct.DeletedAt = &now
 
 	err = idb.DB.Model(&product).Update(newProduct)
 
@@ -456,6 +459,8 @@ func (idb *InDB) UpdateCategoryProduct(c *gin.Context) {
 func (idb *InDB) DeleteCategoryProduct(c *gin.Context) {
 	var res model.Response
 
+	now := time.Now()
+
 	id := c.Param("id")
 
 	var categoryProduct model.CategoryProduct
@@ -470,7 +475,7 @@ func (idb *InDB) DeleteCategoryProduct(c *gin.Context) {
 		return
 	}
 
-	newCategoryProduct.DeletedAt = time.Now()
+	newCategoryProduct.DeletedAt = &now
 
 	err = idb.DB.Model(&categoryProduct).Update(newCategoryProduct)
 
@@ -576,6 +581,7 @@ func (idb *InDB) DeleteProductImage(c *gin.Context) {
 	var res model.Response
 
 	id := c.Param("id")
+	now := time.Now()
 
 	var productImage model.ProductImage
 	var newProductImage model.ProductImage
@@ -589,7 +595,7 @@ func (idb *InDB) DeleteProductImage(c *gin.Context) {
 		return
 	}
 
-	newProductImage.DeletedAt = time.Now()
+	newProductImage.DeletedAt = &now
 
 	err = idb.DB.Model(&productImage).Update(newProductImage)
 
@@ -623,8 +629,9 @@ func (idb *InDB) DeleteImage(c *gin.Context) {
 		c.JSON(http.StatusBadGateway, res)
 		return
 	}
+	now := time.Now()
 
-	newImage.DeletedAt = time.Now()
+	newImage.DeletedAt = &now
 
 	err = idb.DB.Model(&image).Update(newImage)
 
