@@ -50,6 +50,142 @@ func (idb *InDB) InsertCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+func (idb *InDB) GetCategoryList(c *gin.Context) {
+	var categories []*model.Category
+	var res model.Response
+
+	enableParam := c.Query("enable")
+
+	enable := true
+	if enableParam == "true" {
+		enable = true
+	} else if enableParam == "false" {
+		enable = false
+	}
+
+	err := idb.DB.Where("enable = ? AND deleted_at IS NULL", enable).Find(&categories)
+
+	if err.Error != nil {
+		common.Error(err.Error, "Failed get category list")
+		res.Success = false
+		res.Message = "Failed get category list"
+		res.Data = categories
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	if len(categories) == 0 {
+		res.Success = true
+		res.Message = "category is empty"
+		c.JSON(http.StatusOK, res)
+		return
+	} else {
+		res.Success = true
+		res.Message = "Success get category list"
+		res.Data = categories
+		c.JSON(http.StatusOK, res)
+	}
+}
+
+func (idb *InDB) UpdateCategory(c *gin.Context) {
+	var res model.Response
+
+	id := c.Param("id")
+	name := c.PostForm("name")
+	enable := c.PostForm("enable")
+	e := true
+	if enable == "true" {
+		e = true
+	} else if enable == "false" {
+		e = false
+	}
+
+	if enable == "" {
+		res.Success = false
+		res.Message = "request not valid"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	var category model.Category
+	var newCategory model.Category
+
+	err := idb.DB.First(&category, id)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "can't get data from database"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+	//newProduct.ID = product.ID
+	if name != "" {
+		newCategory.Name = name
+	}
+	newCategory.Name = name
+	newCategory.Enable = &e
+	newCategory.UpdatedAt = time.Now()
+
+	err = idb.DB.Model(&category).Update(newCategory)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "can't update data to database"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	res.Success = true
+	res.Message = "Success update data to database"
+	res.Data = err.Value
+	c.JSON(http.StatusOK, res)
+
+}
+
+func (idb *InDB) DeleteCategory(c *gin.Context) {
+	var res model.Response
+
+	id := c.Param("id")
+
+	var category model.Category
+	var newCategory model.Category
+
+	err := idb.DB.First(&category, id)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "data doesn't exist"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	newCategory.DeletedAt = time.Now()
+
+	err = idb.DB.Model(&category).Update(newCategory)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "can't delete data from database"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	err = idb.DB.Exec("UPDATE category_products SET deleted_at=? WHERE category_id=?", time.Now(), id)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "can't delete data from category_products"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	res.Success = true
+	res.Message = "Success delete data from database"
+	//res.Data = err.Value
+	c.JSON(http.StatusOK, res)
+
+}
+
 func (idb *InDB) InsertProduct(c *gin.Context) {
 	var product model.ProductModel
 	var res model.Response
@@ -86,43 +222,6 @@ func (idb *InDB) InsertProduct(c *gin.Context) {
 	res.Message = "Success to insert product"
 	res.Data = product
 	c.JSON(http.StatusOK, res)
-}
-
-func (idb *InDB) GetCategoryList(c *gin.Context) {
-	var categories []*model.Category
-	var res model.Response
-
-	enableParam := c.Query("enable")
-
-	enable := true
-	if enableParam == "true" {
-		enable = true
-	} else if enableParam == "false" {
-		enable = false
-	}
-
-	err := idb.DB.Where("enable = ?", enable).Find(&categories)
-
-	if err.Error != nil {
-		common.Error(err.Error, "Failed get category list")
-		res.Success = false
-		res.Message = "Failed get category list"
-		res.Data = categories
-		c.JSON(http.StatusBadRequest, res)
-		return
-	}
-
-	if len(categories) == 0 {
-		res.Success = true
-		res.Message = "category is empty"
-		c.JSON(http.StatusOK, res)
-		return
-	} else {
-		res.Success = true
-		res.Message = "Success get category list"
-		res.Data = categories
-		c.JSON(http.StatusOK, res)
-	}
 }
 
 func (idb *InDB) GetProductList(c *gin.Context) {
@@ -162,50 +261,6 @@ func (idb *InDB) GetProductList(c *gin.Context) {
 		res.Data = products
 		c.JSON(http.StatusOK, res)
 	}
-}
-
-func (idb *InDB) InsertCategoryProduct(c *gin.Context) {
-	var categoryproduct model.CategoryProduct
-	var result gin.H
-	now := time.Now()
-
-	product_id := c.PostForm("product_id")
-	category_id := c.PostForm("category_id")
-	p_id, _ := strconv.ParseUint(product_id, 10, 32)
-	c_id, _ := strconv.ParseUint(category_id, 10, 32)
-
-	categoryproduct.CategoryID = uint(c_id)
-	categoryproduct.ProductID = uint(p_id)
-	categoryproduct.CreatedAt = now
-	categoryproduct.UpdatedAt = now
-
-	if categoryproduct.CategoryID == 0 || categoryproduct.ProductID == 0 {
-		result = gin.H{
-			"success": false,
-			"message": "Request not valid",
-		}
-		c.JSON(http.StatusBadRequest, result)
-		return
-	}
-
-	err := idb.DB.Create(&categoryproduct)
-
-	if err.Error != nil {
-		common.Error(err.Error, "Failed to insert category product")
-		result = gin.H{
-			"success": false,
-			"message": err.Error,
-		}
-		c.JSON(http.StatusBadRequest, result)
-		return
-	}
-
-	result = gin.H{
-		"success": true,
-		"message": "Success insert category product",
-		"data":    categoryproduct,
-	}
-	c.JSON(http.StatusOK, result)
 }
 
 func (idb *InDB) UpdateProduct(c *gin.Context) {
@@ -266,59 +321,87 @@ func (idb *InDB) UpdateProduct(c *gin.Context) {
 
 }
 
-func (idb *InDB) UpdateCategory(c *gin.Context) {
+func (idb *InDB) DeleteProduct(c *gin.Context) {
 	var res model.Response
 
 	id := c.Param("id")
-	name := c.PostForm("name")
-	enable := c.PostForm("enable")
-	e := true
-	if enable == "true" {
-		e = true
-	} else if enable == "false" {
-		e = false
-	}
 
-	if enable == "" {
-		res.Success = false
-		res.Message = "request not valid"
-		c.JSON(http.StatusBadRequest, res)
-		return
-	}
+	var product model.Product
+	var newProduct model.Product
 
-	var category model.Category
-	var newCategory model.Category
-
-	err := idb.DB.First(&category, id)
+	err := idb.DB.First(&product, id)
 
 	if err.Error != nil {
 		res.Success = false
-		res.Message = "can't get data from database"
+		res.Message = "data doesn't exist"
 		c.JSON(http.StatusBadGateway, res)
 		return
 	}
-	//newProduct.ID = product.ID
-	if name != "" {
-		newCategory.Name = name
-	}
-	newCategory.Name = name
-	newCategory.Enable = &e
-	newCategory.UpdatedAt = time.Now()
 
-	err = idb.DB.Model(&category).Update(newCategory)
+	newProduct.DeletedAt = time.Now()
+
+	err = idb.DB.Model(&product).Update(newProduct)
 
 	if err.Error != nil {
 		res.Success = false
-		res.Message = "can't update data to database"
+		res.Message = "can't delete data from database"
 		c.JSON(http.StatusBadGateway, res)
 		return
 	}
+
+	err = idb.DB.Exec("UPDATE category_products SET deleted_at=? WHERE product_id=?", time.Now(), id)
+
+	err = idb.DB.Exec("UPDATE product_images SET deleted_at=? WHERE product_id=?", time.Now(), id)
 
 	res.Success = true
-	res.Message = "Success update data to database"
-	res.Data = err.Value
+	res.Message = "Success delete data from database"
+	//res.Data = err.Value
 	c.JSON(http.StatusOK, res)
 
+}
+
+func (idb *InDB) InsertCategoryProduct(c *gin.Context) {
+	var categoryproduct model.CategoryProduct
+	var result gin.H
+	now := time.Now()
+
+	product_id := c.PostForm("product_id")
+	category_id := c.PostForm("category_id")
+	p_id, _ := strconv.ParseUint(product_id, 10, 32)
+	c_id, _ := strconv.ParseUint(category_id, 10, 32)
+
+	categoryproduct.CategoryID = uint(c_id)
+	categoryproduct.ProductID = uint(p_id)
+	categoryproduct.CreatedAt = now
+	categoryproduct.UpdatedAt = now
+
+	if categoryproduct.CategoryID == 0 || categoryproduct.ProductID == 0 {
+		result = gin.H{
+			"success": false,
+			"message": "Request not valid",
+		}
+		c.JSON(http.StatusBadRequest, result)
+		return
+	}
+
+	err := idb.DB.Create(&categoryproduct)
+
+	if err.Error != nil {
+		common.Error(err.Error, "Failed to insert category product")
+		result = gin.H{
+			"success": false,
+			"message": err.Error,
+		}
+		c.JSON(http.StatusBadRequest, result)
+		return
+	}
+
+	result = gin.H{
+		"success": true,
+		"message": "Success insert category product",
+		"data":    categoryproduct,
+	}
+	c.JSON(http.StatusOK, result)
 }
 
 func (idb *InDB) UpdateCategoryProduct(c *gin.Context) {
@@ -366,6 +449,41 @@ func (idb *InDB) UpdateCategoryProduct(c *gin.Context) {
 	res.Success = true
 	res.Message = "Success update data to database"
 	res.Data = err.Value
+	c.JSON(http.StatusOK, res)
+
+}
+
+func (idb *InDB) DeleteCategoryProduct(c *gin.Context) {
+	var res model.Response
+
+	id := c.Param("id")
+
+	var categoryProduct model.CategoryProduct
+	var newCategoryProduct model.CategoryProduct
+
+	err := idb.DB.First(&categoryProduct, id)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "data doesn't exist"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	newCategoryProduct.DeletedAt = time.Now()
+
+	err = idb.DB.Model(&categoryProduct).Update(newCategoryProduct)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "can't delete data from database"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	res.Success = true
+	res.Message = "Success delete data from database"
+	//res.Data = err.Value
 	c.JSON(http.StatusOK, res)
 
 }
@@ -452,6 +570,78 @@ func (idb *InDB) InsertProductImage(c *gin.Context) {
 	res.Message = "Success save data to database"
 	res.Data = err.Value
 	c.JSON(http.StatusOK, res)
+}
+
+func (idb *InDB) DeleteProductImage(c *gin.Context) {
+	var res model.Response
+
+	id := c.Param("id")
+
+	var productImage model.ProductImage
+	var newProductImage model.ProductImage
+
+	err := idb.DB.First(&productImage, id)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "data doesn't exist"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	newProductImage.DeletedAt = time.Now()
+
+	err = idb.DB.Model(&productImage).Update(newProductImage)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "can't delete data from database"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	res.Success = true
+	res.Message = "Success delete data from database"
+	//res.Data = err.Value
+	c.JSON(http.StatusOK, res)
+
+}
+
+func (idb *InDB) DeleteImage(c *gin.Context) {
+	var res model.Response
+
+	id := c.Param("id")
+
+	var image model.Image
+	var newImage model.Image
+
+	err := idb.DB.First(&image, id)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "data doesn't exist"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	newImage.DeletedAt = time.Now()
+
+	err = idb.DB.Model(&image).Update(newImage)
+
+	if err.Error != nil {
+		res.Success = false
+		res.Message = "can't delete data from database"
+		c.JSON(http.StatusBadGateway, res)
+		return
+	}
+
+	err = idb.DB.Exec("UPDATE product_images SET deleted_at=? WHERE image_id=?", time.Now(), id)
+
+	res.Success = true
+	res.Message = "Success delete data from database"
+	//res.Data = err.Value
+	c.JSON(http.StatusOK, res)
+
 }
 
 func (idb *InDB) GetAll(c *gin.Context) {
