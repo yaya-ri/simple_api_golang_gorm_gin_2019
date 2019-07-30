@@ -378,10 +378,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "120.0.0.1:3000/category/:id",
+					"raw": "120.7.0.1:3000/category/:id",
 					"host": [
 						"120",
-						"0",
+						"7",
 						"0",
 						"1"
 					],
@@ -393,7 +393,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": ""
+							"value": "14"
 						}
 					]
 				}
@@ -406,9 +406,9 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "120.0.0.1:3000/product/:id",
+					"raw": "127.0.0.1:3000/product/:id",
 					"host": [
-						"120",
+						"127",
 						"0",
 						"0",
 						"1"
@@ -434,9 +434,9 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "120.0.0.1:3000/category_product/:id",
+					"raw": "127.0.0.1:3000/category_product/:id",
 					"host": [
-						"120",
+						"127",
 						"0",
 						"0",
 						"1"
@@ -462,9 +462,9 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "120.0.0.1:3000/image/:id",
+					"raw": "127.0.0.1:3000/image/:id",
 					"host": [
-						"120",
+						"127",
 						"0",
 						"0",
 						"1"
@@ -490,9 +490,9 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "120.0.0.1:3000/product_image/:id",
+					"raw": "127.0.0.1:3000/product_image/:id",
 					"host": [
-						"120",
+						"127",
 						"0",
 						"0",
 						"1"
