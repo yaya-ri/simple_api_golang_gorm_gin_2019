@@ -17,18 +17,24 @@ func main() {
 	router.GET("/category", inDB.GetCategoryList)
 	router.POST("/category", inDB.InsertCategory)
 	router.PUT("/category/:id", inDB.UpdateCategory)
+	router.DELETE("category/:id", inDB.DeleteCategory)
 
 	router.POST("/product", inDB.InsertProduct)
 	router.GET("/product", inDB.GetProductList)
 	router.PUT("/product/:id", inDB.UpdateProduct)
+	router.DELETE("product/:id", inDB.DeleteProduct)
 
 	router.POST("/category_product", inDB.InsertCategoryProduct)
 	router.PUT("/category_product/:id", inDB.UpdateCategoryProduct)
+	router.DELETE("category_product/:id", inDB.DeleteCategoryProduct)
 
 	router.POST("/image", inDB.UploadImage)
+	router.DELETE("image/:id", inDB.DeleteImage)
+
 	//router.PUT("/category_product/:id", inDB.UpdateCategoryProduct)
 
 	router.POST("/product_image", inDB.InsertProductImage)
+	router.DELETE("product_image/:id", inDB.DeleteProductImage)
 
 	router.GET("/getAll", inDB.GetAll)
 
