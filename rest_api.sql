@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 30, 2019 at 03:12 AM
+-- Generation Time: Jul 30, 2019 at 04:37 AM
 -- Server version: 5.7.26
 -- PHP Version: 7.3.7
 
@@ -45,7 +45,11 @@ INSERT INTO `categories` (`id`, `name`, `enable`, `created_at`, `updated_at`, `d
 (10, 'learning', 0, '2019-07-28 12:04:36', '2019-07-29 03:01:39', NULL),
 (11, 'learning', 1, '2019-07-28 12:04:37', '2019-07-28 12:04:37', NULL),
 (12, 'belajar', 1, '2019-07-28 13:42:50', '2019-07-28 13:42:50', NULL),
-(13, 'aye', 0, '2019-07-29 02:59:39', '2019-07-29 03:01:07', NULL);
+(13, 'aye', 0, '2019-07-29 02:59:39', '2019-07-29 03:01:07', NULL),
+(14, 'belajar', 1, '2019-07-30 03:28:31', '2019-07-30 03:32:42', '2019-07-30 03:32:42'),
+(15, 'belajar', 1, '2019-07-30 03:33:45', '2019-07-30 03:39:42', '2019-07-30 03:39:42'),
+(16, 'belajar', 1, '2019-07-30 03:39:29', '2019-07-30 03:39:29', NULL),
+(17, 'belajar', 1, '2019-07-30 04:26:11', '2019-07-30 04:26:11', NULL);
 
 -- --------------------------------------------------------
 
@@ -58,18 +62,18 @@ CREATE TABLE `category_products` (
   `product_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `category_products`
 --
 
-INSERT INTO `category_products` (`id`, `product_id`, `category_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 2, 2, '2019-07-28 13:20:44', '2019-07-30 03:11:33', '2019-07-30 03:11:33'),
-(2, 4, 4, '2019-07-28 14:26:48', '2019-07-28 23:00:31', '2019-07-30 03:01:38'),
-(3, 4, 3, '2019-07-29 03:11:56', '2019-07-29 03:14:30', '2019-07-30 03:01:38');
+INSERT INTO `category_products` (`id`, `product_id`, `category_id`, `created_at`, `updated_at`) VALUES
+(3, 4, 3, '2019-07-29 03:11:56', '2019-07-29 03:14:30'),
+(4, 7, 14, '2019-07-30 03:31:50', '2019-07-30 03:31:50'),
+(7, 9, 17, '2019-07-30 04:26:30', '2019-07-30 04:26:30'),
+(8, 9, 17, '2019-07-30 04:27:41', '2019-07-30 04:27:41');
 
 -- --------------------------------------------------------
 
@@ -92,8 +96,10 @@ CREATE TABLE `images` (
 --
 
 INSERT INTO `images` (`id`, `name`, `file`, `enable`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'images.jpg', './images/images.jpg.png', 0, '2019-07-28 22:43:22', '2019-07-30 03:04:54', NULL),
-(2, 'batik.jpg', './images/batik.jpg.png', 0, '2019-07-29 03:16:05', '2019-07-29 03:16:05', NULL);
+(1, 'images.jpg', './images/images.jpg.png', 1, '2019-07-28 22:43:22', '2019-07-30 03:04:54', NULL),
+(2, 'batik.jpg', './images/batik.jpg.png', 1, '2019-07-29 03:16:05', '2019-07-29 03:16:05', NULL),
+(3, 'DESAIN BANNER 1 HUT RI 74.psd', './images/DESAIN BANNER 1 HUT RI 74.psd.png', 1, '2019-07-30 03:41:10', '2019-07-30 03:41:49', '2019-07-30 03:41:49'),
+(4, 'DESAIN BANNER 1 HUT RI 74.psd', './images/DESAIN BANNER 1 HUT RI 74.psd.png', 1, '2019-07-30 04:26:44', '2019-07-30 04:36:41', '2019-07-30 04:36:41');
 
 -- --------------------------------------------------------
 
@@ -116,13 +122,15 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `enable`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'adsds', 'aassss', 1, '2019-07-28 12:13:59', '2019-07-28 23:00:54', NULL),
+(1, 'adsds', 'aassss', 1, '2019-07-28 12:13:59', '2019-07-30 04:24:56', '2019-07-30 04:24:56'),
 (2, 'buku', 'buku adalah', 1, '2019-07-28 13:41:57', '2019-07-28 13:41:57', NULL),
 (3, 'buku', '', 1, '2019-07-28 14:34:04', '2019-07-28 14:34:04', NULL),
-(4, 'uyea', 'huy', 1, '2019-07-29 02:48:58', '2019-07-30 03:01:38', '2019-07-30 03:01:38'),
-(5, 'u', 'u', 1, '2019-07-29 03:03:35', '2019-07-30 03:01:50', '2019-07-30 03:01:50'),
+(4, 'uyea', 'huy', 1, '2019-07-29 02:48:58', '2019-07-30 04:23:18', '2019-07-30 04:23:18'),
+(5, 'u', 'u', 1, '2019-07-29 03:03:35', '2019-07-30 03:01:50', NULL),
 (6, 'uyea', 'huy', 1, '2019-07-29 03:04:58', '2019-07-29 03:04:58', NULL),
-(7, 'uyea', 'huy', 1, '2019-07-29 03:09:28', '2019-07-29 03:09:28', NULL);
+(7, 'uyea', 'huy', 1, '2019-07-29 03:09:28', '2019-07-29 03:09:28', NULL),
+(8, 'p', 'p', 1, '2019-07-30 03:40:14', '2019-07-30 03:40:28', '2019-07-30 03:40:28'),
+(9, 'p', 'p', 1, '2019-07-30 04:26:19', '2019-07-30 04:26:19', NULL);
 
 -- --------------------------------------------------------
 
@@ -135,17 +143,8 @@ CREATE TABLE `product_images` (
   `product_id` int(11) NOT NULL,
   `image_id` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `product_images`
---
-
-INSERT INTO `product_images` (`id`, `product_id`, `image_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 2, 1, '2019-07-28 22:54:00', '2019-07-30 03:10:49', '2019-07-30 03:10:49'),
-(2, 4, 2, '2019-07-29 03:17:39', '2019-07-29 03:17:39', '2019-07-30 03:01:38');
 
 --
 -- Indexes for dumped tables
@@ -193,28 +192,28 @@ ALTER TABLE `product_images`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `category_products`
 --
 ALTER TABLE `category_products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `images`
 --
 ALTER TABLE `images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `product_images`
 --
 ALTER TABLE `product_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
