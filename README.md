@@ -31,6 +31,8 @@ Untuk menjalankan API ini pada local repository berikut instalasinya
      PUT  localhost:3000/category_product/:id 
      DEL  localhost:3000/category_product/:id 
      POST localhost:3000/image
+     GET  localhost:3000/image
+     PUT  localhost:3000/image/:id
      DEL  localhost:3000/image/:id 
      POST localhost:3000/product_image
      DEL  localhost:3000/product_image/:id 
